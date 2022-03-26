@@ -7,29 +7,40 @@ import CreateTodoButton from './components/CreateTodoButton'
 
 
 
-let defaultTodos = [
-  { text: 'Romper un culo', completed: false },
-  { text: 'Tirar piedras', completed: false },
-  { text: 'Matar un puto', completed: false },
-  { text: 'Plantar un arbol', completed: false },
-]
+// let defaultTodos = [
+//   { text: 'Escribir un libro', completed: false },
+//   { text: 'Comprar pan', completed: false },
+//   { text: 'Viajar a Alaska', completed: false },
+//   { text: 'Plantar un arbol', completed: false },
+// ]
 
 function App() {
-  const [todos, setTodos] = useState(defaultTodos);
+  const localStorageTodos = localStorage.getItem('TODOS_V1');
+  let parsedTodos;
+
+  if(!localStorageTodos){
+    localStorage.setItem('TODOS_V1', JSON.stringify([]));
+    parsedTodos = [];
+  }else{
+    parsedTodos = JSON.parse(localStorageTodos);
+  }
+
+
+  const [todos, setTodos] = useState(parsedTodos);
   const [searchValue, setSearchValue] = useState('');
 
-  const completedTodos = todos.filter(todo => !!todo.completed).length
-  const totalTodos = todos.length
+  const completedTodos = todos.filter(todo => !!todo.completed).length;
+  const totalTodos = todos.length;
 
-  let searchedTodos = []
+  let searchedTodos = [];
 
   if(searchValue.length === 0){
-    searchedTodos = todos
+    searchedTodos = todos;
   }else{
     searchedTodos = todos.filter(todo => {
-      const todoText = todo.text.toLowerCase()
-      const searchText = searchValue.toLowerCase()
-      return todoText.includes(searchText)
+      const todoText = todo.text.toLowerCase();
+      const searchText = searchValue.toLowerCase();
+      return todoText.includes(searchText);
     })
   }
 
@@ -37,11 +48,17 @@ function App() {
     const todoIndex = todos.findIndex(todo => todo.text === text);
     const newTodos = [...todos];
     newTodos[todoIndex].completed = true; 
-    setTodos(newTodos);
+    saveTodos(newTodos);
   }
 
   const deleteTodo = text => {     
     const newTodos= todos.filter(todo => todo.text !== text)
+    saveTodos(newTodos);
+  }
+
+  const saveTodos = (newTodos) => {
+    const stringifiedTodos = JSON.stringify(newTodos);
+    localStorage.setItem('TODOS_V1', stringifiedTodos);
     setTodos(newTodos);
   }
 
